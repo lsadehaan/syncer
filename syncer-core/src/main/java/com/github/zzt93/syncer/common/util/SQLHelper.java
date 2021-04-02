@@ -10,6 +10,8 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  * @author zzt
@@ -17,6 +19,8 @@ import java.sql.Timestamp;
 public class SQLHelper {
 
   private static final Logger logger = LoggerFactory.getLogger(SQLHelper.class);
+
+  private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
   public static String inSQL(Object value) {
     if (value == null) {
@@ -26,13 +30,19 @@ public class SQLHelper {
     if (ClassUtils.isPrimitiveOrWrapper(aClass)
         || CharSequence.class.isAssignableFrom(aClass)
         || value instanceof Timestamp
-        || value instanceof BigDecimal) {
+        || value instanceof BigDecimal
+        || value instanceof Date) {
       if (value instanceof String) {
         // TODO 2019/3/3 http://www.jguru.com/faq/view.jsp?EID=8881 {escape '/'} ?
         String replace = StringUtils.replace(StringUtils.replace(value.toString(), "'", "''"), "\\", "\\\\");
         value = "'" + replace + "'";
       } else if (value instanceof Timestamp) {
         value = "'" + value.toString() + "'";
+      } else if (value instanceof BigDecimal) {
+        value = "'" + value.toString() + "'";
+      }
+      else if (value instanceof Date) {
+        value = "'" +  dateFormatter.format(((Date)value).toInstant()) + "'";
       }
     } else if (SQLFunction.class.isAssignableFrom(aClass)) {
       value = value.toString();
