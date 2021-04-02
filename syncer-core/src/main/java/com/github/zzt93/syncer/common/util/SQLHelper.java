@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -21,7 +22,7 @@ public class SQLHelper {
 
   private static final Logger logger = LoggerFactory.getLogger(SQLHelper.class);
 
-  private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+  
 
   public static String inSQL(Object value) {
     if (value == null) {
@@ -43,8 +44,8 @@ public class SQLHelper {
         value = "'" + value.toString() + "'";
       }
       else if (value instanceof Date) {
-        value = "'" +  dateFormatter.format(((Date)value).toInstant().atZone(ZoneId.systemDefault())
-            .toLocalDate()) + "'";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        value = "'" +  dateFormat.format(value) + "'";
       }
     } else if (SQLFunction.class.isAssignableFrom(aClass)) {
       value = value.toString();
